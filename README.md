@@ -90,6 +90,7 @@ services:
       services:
       - mysql-for-spring-music
 ```
+Alternatively to `cf.manifest.contents`, `cf.manifest.url` is supported.
 
 Notice, `services` have a different semantic compared to `VanillaCloudFoundryApplication`. There you can define the `service` you want to instantiate by specifying 
 the `plan` and `instanceName` while here `services` refer to the `serviceInstanceNames` that needs to be created manually using 

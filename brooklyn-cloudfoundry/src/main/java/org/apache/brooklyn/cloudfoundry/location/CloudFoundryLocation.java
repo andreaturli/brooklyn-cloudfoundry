@@ -26,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +68,7 @@ import org.springframework.core.io.UrlResource;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
@@ -150,7 +152,7 @@ public class CloudFoundryLocation extends AbstractLocation implements MachinePro
         if (isVanillaCloudFoundryApplication(entity)) {
             pushApplicationRequest = createPushApplicationRequestFromVanillaCloudFoundryApplication(entity);
             serviceInstanceNames = createInstanceServices(entity.config().get(VanillaCloudFoundryApplication.SERVICES));
-        } else if(isCloudFoundryAppFromManifet(entity)) {
+        } else if(isCloudFoundryAppFromManifest(entity)) {
             Map<?, ?> manifestAsMap = getMapFromManifest(getManifestYamlFromEntity(entity));
             pushApplicationRequest = createPushApplicationRequestFromManifest(manifestAsMap);
             serviceInstanceNames = getServiceInstancesFromManifest(manifestAsMap);
@@ -211,7 +213,6 @@ public class CloudFoundryLocation extends AbstractLocation implements MachinePro
         }
         return  (Entity) callerContext;
     }
-
 
     private PushApplicationRequest createPushApplicationRequestFromVanillaCloudFoundryApplication(Entity entity) {
         String applicationName = entity.config().get(VanillaCloudFoundryApplication.APPLICATION_NAME);
@@ -315,11 +316,11 @@ public class CloudFoundryLocation extends AbstractLocation implements MachinePro
     }
 
     protected boolean isVanillaCloudFoundryApplication(Entity entity) {
-        return entity.getEntityType().getName().equalsIgnoreCase(VanillaCloudFoundryApplication.class.getName());
+        return implementsInterface(entity, VanillaCloudFoundryApplication.class);
     }
 
-    protected boolean isCloudFoundryAppFromManifet(Entity entity) {
-        return entity.getEntityType().getName().equalsIgnoreCase(CloudFoundryAppFromManifest.class.getName());
+    protected boolean isCloudFoundryAppFromManifest(Entity entity) {
+        return implementsInterface(entity, CloudFoundryAppFromManifest.class);
     }
 
     private List<String> createInstanceServices(List<Map<String, Object>> services) {
@@ -396,6 +397,9 @@ public class CloudFoundryLocation extends AbstractLocation implements MachinePro
                 ).block();
     }
 
+    private boolean implementsInterface(Entity entity, Class<?> type) {
+        return Iterables.tryFind(Arrays.asList(entity.getClass().getInterfaces()), Predicates.assignableFrom(type)).isPresent();
+    }
 
     @Override
     public MachineProvisioningLocation<MachineLocation> newSubLocation(Map<?, ?> map) {
