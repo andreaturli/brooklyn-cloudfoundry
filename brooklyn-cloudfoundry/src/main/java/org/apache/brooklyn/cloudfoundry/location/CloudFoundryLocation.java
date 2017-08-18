@@ -150,7 +150,7 @@ public class CloudFoundryLocation extends AbstractLocation implements MachinePro
         if (isVanillaCloudFoundryApplication(entity)) {
             pushApplicationRequest = createPushApplicationRequestFromVanillaCloudFoundryApplication(entity);
             serviceInstanceNames = createInstanceServices(entity.config().get(VanillaCloudFoundryApplication.SERVICES));
-        } else if(isCloudFoundryAppFromManifet(entity)) {
+        } else if(isCloudFoundryAppFromManifest(entity)) {
             Map<?, ?> manifestAsMap = getMapFromManifest(getManifestYamlFromEntity(entity));
             pushApplicationRequest = createPushApplicationRequestFromManifest(manifestAsMap);
             serviceInstanceNames = getServiceInstancesFromManifest(manifestAsMap);
@@ -211,7 +211,6 @@ public class CloudFoundryLocation extends AbstractLocation implements MachinePro
         }
         return  (Entity) callerContext;
     }
-
 
     private PushApplicationRequest createPushApplicationRequestFromVanillaCloudFoundryApplication(Entity entity) {
         String applicationName = entity.config().get(VanillaCloudFoundryApplication.APPLICATION_NAME);
@@ -318,7 +317,7 @@ public class CloudFoundryLocation extends AbstractLocation implements MachinePro
         return entity.getEntityType().getName().equalsIgnoreCase(VanillaCloudFoundryApplication.class.getName());
     }
 
-    protected boolean isCloudFoundryAppFromManifet(Entity entity) {
+    protected boolean isCloudFoundryAppFromManifest(Entity entity) {
         return entity.getEntityType().getName().equalsIgnoreCase(CloudFoundryAppFromManifest.class.getName());
     }
 
